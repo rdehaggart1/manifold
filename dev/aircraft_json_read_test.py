@@ -29,7 +29,7 @@ while True:
         a_pos = (lat, lon)
 
         if (not callsign) or (not lat) or (not lon):
-            print("None")
+            print(callsign)
         else:
 
             distance=hs.haversine(a_pos, MY_POS, unit=Unit.KILOMETERS)
