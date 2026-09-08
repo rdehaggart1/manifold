@@ -1,4 +1,4 @@
-# https://github.com/TomSchimansky/TkinterMapView/blob/main/examples/map_view_simple_example.py
+# https://github.com/TomSchimprintansky/TkinterMapView/blob/main/examples/map_view_simple_example.py
 
 import tkinter
 import tkintermapview
