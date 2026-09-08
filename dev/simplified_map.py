@@ -20,6 +20,13 @@ MY_LAT = 53.933192
 MY_LON = -1.997486
 MY_POS = (MY_LAT, MY_LON)
 
+class my_aircraft:
+    callsign = "0"
+    hex_id   = 0
+    location = (0, 0)
+    altitude = 0
+    marker   = 0
+
 def create_map():
     """Creates a tkinter window and a map widget within it
 
@@ -38,20 +45,17 @@ def create_map():
     # for full fullscreen, no toolbar. nice for display
     # root_tk.attributes('-fullscreen',True)
 
-    # scale window to full display
     display_width  = root_tk.winfo_screenwidth()               
     display_height = root_tk.winfo_screenheight()               
     root_tk.geometry("%dx%d" % (display_width, display_height))
 
-    # create map widget
     map_widget = tkintermapview.TkinterMapView(root_tk, width=1000, height=700, corner_radius=0)
     map_widget.pack(fill="both", expand=True)
 
-    # set current position with address
     map_widget.set_address("Low Bradley England", marker=False)
 
     centre_coords = map_widget.get_position()
-    print(f"Centre: {centre_coords}")
+    # print(f"Centre: {centre_coords}")
 
     return root_tk, map_widget
 
@@ -86,28 +90,22 @@ def get_aircraft_position(aircraft):
     return lat, lon, alt
 
 def plot_aircraft_markers(list_of_aircraft, map_widget, marker_icon):
-    closest_aircraft = ""
-    min_distance = 1e6
 
     for a in list_of_aircraft:
-        callsign = a.get("flight", "").strip()
-        hex_id = a.get("hex")
+        aircraft          = my_aircraft()
+        lat, lon, alt     = get_aircraft_position(a)
+        aircraft.callsign = a.get("flight", "").strip()
+        aircraft.hex_id   = a.get("hex")
+        aircraft.position = (lat, lon)
 
-        lat, lon, alt = get_aircraft_position(a)
+        print(aircraft.callsign)
 
-        aircraft_position = (lat, lon)
-
-        if (not callsign) or (not lat) or (not lon):
-            #print(callsign)
+        if (not aircraft.callsign) or (not lat) or (not lon):
+            # print(callsign)
             break
         else:
-            marker = map_widget.set_marker(lat, lon, text=callsign, icon=marker_icon)
-
-            distance = hs.haversine(aircraft_position, MY_POS, unit=Unit.KILOMETERS)
-
-            if distance < min_distance:
-                min_distance = distance
-                closest_aircraft = callsign
+            # * operator unpacks the position tuple into separate coords
+            aircraft.marker = map_widget.set_marker(*aircraft.position, text=aircraft.callsign, icon=marker_icon)
 
             #print(
             #    hex_id,
@@ -118,19 +116,21 @@ def plot_aircraft_markers(list_of_aircraft, map_widget, marker_icon):
             #    f"{distance:.2f}km"
             #)
 
-    print(f"Closest aircraft is {closest_aircraft} at {min_distance:.2f}km")
-
-    print()
+def update_markers(root_tk, map_widget, plane_icon):
+    list_of_aircraft = load_nearby_aircraft(AIRCRAFT_JSON_FILE)
+    plot_aircraft_markers(list_of_aircraft, map_widget, plane_icon)
+    root_tk.after(10000, update_markers, root_tk, map_widget, plane_icon) 
 
 if __name__=="__main__":
 
     root_tk, map_widget = create_map()
 
-    list_of_aircraft = load_nearby_aircraft(AIRCRAFT_JSON_FILE)
-
     current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-    PLANE_ICON = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "plane_icon.png")).resize((40, 40)))
+    plane_icon = ImageTk.PhotoImage(Image.open(os.path.join(current_path, "plane_icon.png")).resize((40, 40)))
 
-    plot_aircraft_markers(list_of_aircraft, map_widget, PLANE_ICON)
+    list_of_aircraft = load_nearby_aircraft(AIRCRAFT_JSON_FILE)
+    plot_aircraft_markers(list_of_aircraft, map_widget, plane_icon)
+
+    update_markers(root_tk, map_widget, plane_icon)
 
     root_tk.mainloop()
