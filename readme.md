@@ -21,6 +21,9 @@ Then verify that it dump1090 is running as a service
 systemctl status dump1090-fa
 ```
 
+## cairosvg
+To convert svg to png
+
 # Hardware
 FlightAware Pro Stick Plus - [The Pi Hut](https://thepihut.com/products/flightaware-pro-stick-plus-usb-sdr-ads-b-receiver)
 

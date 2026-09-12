@@ -119,7 +119,7 @@ def plot_aircraft_markers(list_of_aircraft, map_widget, marker_icon):
 def update_markers(root_tk, map_widget, plane_icon):
     list_of_aircraft = load_nearby_aircraft(AIRCRAFT_JSON_FILE)
     plot_aircraft_markers(list_of_aircraft, map_widget, plane_icon)
-    root_tk.after(10000, update_markers, root_tk, map_widget, plane_icon) 
+    root_tk.after(1000, update_markers, root_tk, map_widget, plane_icon) 
 
 if __name__=="__main__":
 
